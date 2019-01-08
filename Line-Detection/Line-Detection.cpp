@@ -4,6 +4,8 @@
 using namespace std;
 using namespace cv;
 
+Mat HoughTransform(Mat*);
+
 void player(String filename) {
 	VideoCapture cap;
 	if (!cap.open(filename)) {
@@ -18,8 +20,9 @@ void player(String filename) {
 	while (true) {
 		cap >> frame;
 		frame = frame(Rect(530, 0, 580, 500));
-		cvtColor(frame, frame, COLOR_BGR2GRAY);
-		threshold(frame, frame, 80, 180, THRESH_BINARY);
+		//cvtColor(frame, frame, COLOR_BGR2GRAY);
+		//threshold(frame, frame, 80, 180, THRESH_BINARY);
+		frame = HoughTransform(&frame);
 		imshow(filename, frame);
 		if (waitKey(33) >= 0) {
 			//if (waitKey(32) == 0)
@@ -28,6 +31,25 @@ void player(String filename) {
 		}
 	}
 	cap.release();
+}
+
+Mat HoughTransform(Mat *file) {
+	Mat src = *file;
+	Mat gray;
+	cvtColor(src, gray, COLOR_BGR2GRAY);
+	//GaussianBlur(gray, gray, Size(9, 9), 2, 2);
+	vector<Vec3f> Circles;
+	HoughCircles(gray, Circles, CV_HOUGH_GRADIENT, 1, 15, 160, 60, 0, 0);
+	for (size_t i = 0;i < Circles.size();++i)
+	{
+		Point center(cvRound(Circles[i][0]), cvRound(Circles[i][1]));
+		int radius = cvRound(Circles[i][2]);
+		//»æÖÆÔ²ÐÄ
+		circle(src, center, 3, Scalar(0, 255, 0), -1, 8, 0);
+		//»æÖÆÔ²ÂÖÀª
+		circle(src, center, radius, Scalar(155, 50, 255), 3, 8, 0);
+	}
+	return src;
 }
 
 int main(int argc, char** argv) {
