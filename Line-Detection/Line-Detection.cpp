@@ -47,12 +47,13 @@ Mat HoughTransform(Mat *file) {
 	cvtColor(src, gray, COLOR_BGR2GRAY);
 	//GaussianBlur(gray, gray, Size(9, 9), 2, 2);
 	vector<Vec3f> Circles;
-	HoughCircles(gray, Circles, CV_HOUGH_GRADIENT, 1, 30, 160, 60, 0, 0);
+	HoughCircles(gray, Circles, CV_HOUGH_GRADIENT, 1, 30, 190, 60, 0, 0);
 	for (size_t i = 0;i < Circles.size();++i)
 	{
 		Point center(cvRound(Circles[i][0]), cvRound(Circles[i][1]));
 		int radius = cvRound(Circles[i][2]);
 		circle(src, center, radius, Scalar(155, 50, 255), 3, 8, 0);
+		waitKey(0);
 	}
 	return src;
 }
