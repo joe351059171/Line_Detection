@@ -23,19 +23,20 @@ void player(String filename) {
 		temp = frame.clone();
 		frame = frame(Rect(530, 0, 580, 500));
 		temp = temp(Rect(530, 0, 580, 500));
-		Laplacian(frame, frame, CV_8UC3, 3, 1, 0);
-		frame = frame + temp;
+		//cvtColor(frame, frame, COLOR_BGR2GRAY);
+		//cvtColor(temp, temp, COLOR_BGR2GRAY);
 		medianBlur(frame, frame, 9);
 		Laplacian(frame, frame, CV_8UC3, 3, 1, 0);
 		frame = frame + temp;
-		//cvtColor(frame, frame, COLOR_BGR2GRAY);
+		//Laplacian(frame, frame, CV_8UC3, 3, 1, 0);
+		//frame = frame + temp;
 		//threshold(frame, frame, 80, 180, THRESH_BINARY);
 		frame = HoughTransform(&frame);
 		imshow(filename, frame);
 		if (waitKey(33) >= 0) {
-			//if (waitKey(32) == 0)
+		//	if (waitKey(32) == 0)
 				waitKey(0);
-			//break;
+		//	break;
 		}
 	}
 	cap.release();
@@ -45,15 +46,21 @@ Mat HoughTransform(Mat *file) {
 	Mat src = *file;
 	Mat gray;
 	cvtColor(src, gray, COLOR_BGR2GRAY);
-	//GaussianBlur(gray, gray, Size(9, 9), 2, 2);
+	GaussianBlur(gray, gray, Size(5, 5), 2, 2);
 	vector<Vec3f> Circles;
-	HoughCircles(gray, Circles, CV_HOUGH_GRADIENT, 1, 30, 190, 60, 0, 0);
+	equalizeHist(gray, gray);
+	HoughCircles(gray, Circles, CV_HOUGH_GRADIENT, 1, 50, 160, 60, 0, 0);
 	for (size_t i = 0;i < Circles.size();++i)
 	{
 		Point center(cvRound(Circles[i][0]), cvRound(Circles[i][1]));
 		int radius = cvRound(Circles[i][2]);
 		circle(src, center, radius, Scalar(155, 50, 255), 3, 8, 0);
-		waitKey(0);
+		stringstream filename;
+		string str;
+		filename << rand();
+		filename >> str;
+		str = str + ".jpg";
+		imwrite(str, src);
 	}
 	return src;
 }
